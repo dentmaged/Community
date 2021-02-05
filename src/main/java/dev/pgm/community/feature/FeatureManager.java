@@ -19,6 +19,8 @@ import dev.pgm.community.moderation.feature.types.SQLModerationFeature;
 import dev.pgm.community.motd.MotdFeature;
 import dev.pgm.community.mutations.MutationType;
 import dev.pgm.community.mutations.feature.MutationFeature;
+import dev.pgm.community.nick.feature.NickFeature;
+import dev.pgm.community.nick.feature.types.SQLNickFeature;
 import dev.pgm.community.teleports.TeleportFeature;
 import dev.pgm.community.teleports.TeleportFeatureBase;
 import dev.pgm.community.users.feature.UsersFeature;
@@ -36,6 +38,7 @@ public class FeatureManager {
   private final ModerationFeature moderation;
   private final UsersFeature users;
   private final FriendshipFeature friends;
+  private final NickFeature nick;
 
   private final TeleportFeature teleports;
   private final InfoCommandsFeature infoCommands;
@@ -55,6 +58,7 @@ public class FeatureManager {
     this.reports = new SQLAssistanceFeature(config, logger, database, users);
     this.moderation = new SQLModerationFeature(config, logger, database, users);
     this.friends = new SQLFriendshipFeature(config, logger, database, users);
+    this.nick = new SQLNickFeature(config, logger, database, users);
     // TODO: 1. Add support for non-persist database (e.g NoDBUsersFeature)
     // TODO: 2. Support non-sql databases?
     // Ex. FileReportFeature, MongoReportFeature, RedisReportFeature...
@@ -112,6 +116,10 @@ public class FeatureManager {
     return mutation;
   }
 
+  public NickFeature getNick() {
+    return nick;
+  }
+
   public BroadcastFeature getBroadcast() {
     return broadcast;
   }
@@ -128,6 +136,7 @@ public class FeatureManager {
     commands.registerDependency(FreezeFeature.class, getFreeze());
     commands.registerDependency(MutationFeature.class, getMutations());
     commands.registerDependency(BroadcastFeature.class, getBroadcast());
+    commands.registerDependency(NickFeature.class, getNick());
 
     // Custom command completions
     commands
@@ -168,6 +177,7 @@ public class FeatureManager {
     registerFeatureCommands(getFreeze(), commands);
     registerFeatureCommands(getMutations(), commands);
     registerFeatureCommands(getBroadcast(), commands);
+    registerFeatureCommands(getNick(), commands);
     // TODO: Group calls together and perform upon reload
     // will allow commands to be enabled/disabled with features
 
@@ -194,6 +204,7 @@ public class FeatureManager {
     getFreeze().getConfig().reload(config);
     getMutations().getConfig().reload(config);
     getBroadcast().getConfig().reload(config);
+    getNick().getConfig().reload(config);
     // TODO: Look into maybe unregister commands for features that have been disabled
     // commands#unregisterCommand
     // Will need to check isEnabled

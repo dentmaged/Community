@@ -47,6 +47,11 @@ reports:
 users:
   enabled: true
   
+# Nicknames - Able to adjust username of player to hide from unwanted eyes (todo wow change this message)  
+nick:
+  enabled: true 
+  pgm-integration: true
+  
 # Friends - Settings related to friendship features/commands  
 friends:
   enabled: true
