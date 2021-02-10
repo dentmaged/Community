@@ -25,6 +25,7 @@ import dev.pgm.community.teleports.TeleportFeature;
 import dev.pgm.community.teleports.TeleportFeatureBase;
 import dev.pgm.community.users.feature.UsersFeature;
 import dev.pgm.community.users.feature.types.SQLUsersFeature;
+import dev.pgm.community.vanish.VanishFeature;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,6 +48,7 @@ public class FeatureManager {
   private final FreezeFeature freeze;
   private final MutationFeature mutation;
   private final BroadcastFeature broadcast;
+  private final VanishFeature vanish;
 
   public FeatureManager(
       Configuration config,
@@ -72,6 +74,7 @@ public class FeatureManager {
     this.freeze = new FreezeFeature(config, logger);
     this.mutation = new MutationFeature(config, logger);
     this.broadcast = new BroadcastFeature(config, logger);
+    this.vanish = new VanishFeature(config, logger, nick);
 
     this.registerCommands(commands);
   }
@@ -124,6 +127,10 @@ public class FeatureManager {
     return broadcast;
   }
 
+  public VanishFeature getVanish() {
+    return vanish;
+  }
+
   // Register Feature commands and any dependency
   private void registerCommands(BukkitCommandManager commands) {
     // Dependency injection for features
@@ -137,6 +144,7 @@ public class FeatureManager {
     commands.registerDependency(MutationFeature.class, getMutations());
     commands.registerDependency(BroadcastFeature.class, getBroadcast());
     commands.registerDependency(NickFeature.class, getNick());
+    commands.registerDependency(VanishFeature.class, getVanish());
 
     // Custom command completions
     commands
@@ -178,6 +186,7 @@ public class FeatureManager {
     registerFeatureCommands(getMutations(), commands);
     registerFeatureCommands(getBroadcast(), commands);
     registerFeatureCommands(getNick(), commands);
+    registerFeatureCommands(getVanish(), commands);
     // TODO: Group calls together and perform upon reload
     // will allow commands to be enabled/disabled with features
 
@@ -205,6 +214,7 @@ public class FeatureManager {
     getMutations().getConfig().reload(config);
     getBroadcast().getConfig().reload(config);
     getNick().getConfig().reload(config);
+    getVanish().getConfig().reload(config);
     // TODO: Look into maybe unregister commands for features that have been disabled
     // commands#unregisterCommand
     // Will need to check isEnabled
